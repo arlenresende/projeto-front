@@ -1,4 +1,4 @@
-import AuthPrompt from '@/components/auth/authPrompt.tsx';
+import AuthPrompt from '@/components/auth/authPrompt';
 import SignInForm from './form.tsx';
 
 export default function SignIn() {
