@@ -25,8 +25,7 @@ export default [
       react: { version: 'detect' },
       'import/resolver': {
         typescript: {
-          project: ['./tsconfig.app.json', './tsconfig.json'],
-          alwaysTryTypes: true,
+          project: './tsconfig.json',
         },
         node: {
           extensions: ['.js', '.jsx', '.ts', '.tsx', '.css'],
