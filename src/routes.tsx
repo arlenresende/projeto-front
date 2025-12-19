@@ -1,4 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
+import React from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 import { AppLayout } from './pages/_layouts/app';
 import { AuthLayout } from './pages/_layouts/auth';
@@ -7,10 +9,26 @@ import ForgotPassword from './pages/auth/forgot-password';
 import Register from './pages/auth/register';
 import SignIn from './pages/auth/sign-in';
 
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { token } = useAuth();
+  if (!token) return <Navigate to="/sign-in" replace />;
+  return <>{children}</>;
+}
+
+function RedirectIfAuth({ children }: { children: React.ReactNode }) {
+  const { token } = useAuth();
+  if (token) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <RequireAuth>
+        <AppLayout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: '/',
@@ -24,7 +42,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <AuthLayout />,
+    element: (
+      <RedirectIfAuth>
+        <AuthLayout />
+      </RedirectIfAuth>
+    ),
     children: [
       {
         path: '/sign-in',

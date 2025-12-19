@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { useState } from 'react';
+import { useLogin } from '@/hooks/useLogin';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -12,7 +12,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function signInController() {
-  const [loading, setLoading] = useState(false);
+  const loginMutation = useLogin();
+  const loading = loginMutation.isPending;
 
   const {
     handleSubmit: hookFormHandleSubmit,
@@ -25,8 +26,7 @@ export default function signInController() {
   });
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
-    setLoading(true);
-    console.log(data);
+    await loginMutation.mutateAsync(data);
   });
 
   return {
