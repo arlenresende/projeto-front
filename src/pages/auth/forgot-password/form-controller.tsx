@@ -1,6 +1,9 @@
+import { forgotPasswordRequest } from '@/api/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -22,7 +25,18 @@ export default function forgotPasswordController() {
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
     setLoading(true);
-    console.log('Forgot password data', data);
+    try {
+      const res = await forgotPasswordRequest({ email: data.email });
+      const message = res?.data?.message ?? 'Solicitação enviada';
+      toast.success(message, { className: '!bg-green-400 !text-white' });
+    } catch (error) {
+      const apiMessage =
+        (error as AxiosError<{ message?: string }>).response?.data?.message ??
+        'Erro ao enviar solicitação';
+      toast.error(apiMessage, { className: '!bg-red-400 !text-white' });
+    } finally {
+      setLoading(false);
+    }
   });
 
   return {

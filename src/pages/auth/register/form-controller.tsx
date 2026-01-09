@@ -1,5 +1,5 @@
+import { useRegister } from '@/hooks/useRegister';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -18,7 +18,8 @@ const schema = z
 type FormData = z.infer<typeof schema>;
 
 export default function registerController() {
-  const [loading, setLoading] = useState(false);
+  const registerMutation = useRegister();
+  const loading = registerMutation.isPending;
 
   const {
     handleSubmit: hookFormHandleSubmit,
@@ -31,8 +32,8 @@ export default function registerController() {
   });
 
   const handleSubmit = hookFormHandleSubmit(async (data) => {
-    setLoading(true);
-    console.log('Register data', data);
+    const { name, email, password } = data;
+    await registerMutation.mutateAsync({ name, email, password });
   });
 
   return {

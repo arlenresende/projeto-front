@@ -23,3 +23,38 @@ export async function loginRequest(data: LoginPayload): Promise<LoginResponse> {
     user: payload?.data?.user,
   };
 }
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export type ApiEnvelope<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp: string;
+};
+
+export type ForgotPasswordEnvelope = ApiEnvelope<{ message: string }>;
+
+export async function forgotPasswordRequest(
+  data: ForgotPasswordPayload,
+): Promise<ForgotPasswordEnvelope> {
+  const response = await api.post('/auth/forgot-password', data);
+  return response.data;
+}
+
+export async function registerRequest(data: RegisterPayload): Promise<LoginResponse> {
+  const response = await api.post('/users/register', data);
+  const payload = response.data;
+  return {
+    token: payload?.data?.accessToken,
+    user: payload?.data?.user,
+  };
+}
+
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+}

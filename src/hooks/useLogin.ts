@@ -23,9 +23,14 @@ export function useLogin() {
       });
     },
 
-    onError: () => {
-      const message = 'Erro ao realizar login';
-      toast.error(message, {
+    onError: (error) => {
+      const apiMessage = error.response?.data?.message ?? null;
+      const status = error.response?.status;
+      const isInvalidCreds =
+        status === 401 || (apiMessage ? /invalid credentials/i.test(apiMessage) : false);
+      const toastMessage: string | null = isInvalidCreds ? 'Invalid credentials' : null;
+
+      toast.error(toastMessage, {
         className: '!bg-red-400 !text-white',
       });
     },
