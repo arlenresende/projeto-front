@@ -24,6 +24,21 @@ export async function loginRequest(data: LoginPayload): Promise<LoginResponse> {
   };
 }
 
+export interface RegisterPayload {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export async function registerRequest(data: RegisterPayload): Promise<LoginResponse> {
+  const response = await api.post('/users/register', data);
+  const payload = response.data;
+  return {
+    token: payload?.data?.accessToken,
+    user: payload?.data?.user,
+  };
+}
+
 export interface ForgotPasswordPayload {
   email: string;
 }
@@ -44,17 +59,21 @@ export async function forgotPasswordRequest(
   return response.data;
 }
 
-export async function registerRequest(data: RegisterPayload): Promise<LoginResponse> {
-  const response = await api.post('/users/register', data);
-  const payload = response.data;
-  return {
-    token: payload?.data?.accessToken,
-    user: payload?.data?.user,
-  };
-}
-
-export interface RegisterPayload {
+export type UserProfileEnvelope = ApiEnvelope<{
+  id: string;
   name: string;
   email: string;
-  password: string;
+  avatar: string | null;
+  document: string | null;
+  cellPhone: string | null;
+  birthDate: string | null;
+  gender: string | null;
+  role: 'USER' | 'ADMIN' | string;
+  isActive: boolean;
+  profileCompleted: boolean;
+}>;
+
+export async function profileRequest(): Promise<UserProfileEnvelope> {
+  const response = await api.get('/users/profile');
+  return response.data;
 }
