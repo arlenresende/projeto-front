@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { loginRequest, profileRequest, type LoginPayload, type LoginResponse } from '../api/auth';
 
 export function useLogin() {
-  const { signIn } = useAuth();
+  const { signIn, setProfile } = useAuth();
 
   type ApiEnvelope<T> = {
     success: boolean;
@@ -20,7 +20,7 @@ export function useLogin() {
       signIn(data.token, data.user);
       try {
         const res = await profileRequest();
-        console.log('Perfil do usuário', res);
+        setProfile(res.data);
       } catch (error) {
         console.log('Erro ao buscar perfil', error);
       }

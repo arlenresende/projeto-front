@@ -1,10 +1,12 @@
+import { useAuth } from '@/context/AuthContext';
 import React from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 
 import { AppLayout } from './pages/_layouts/app';
 import { AuthLayout } from './pages/_layouts/auth';
 import Dashboard from './pages/app/dashboard';
+
+import DashboardProfile from './pages/app/profile';
 import ForgotPassword from './pages/auth/forgot-password';
 import Register from './pages/auth/register';
 import SignIn from './pages/auth/sign-in';
@@ -37,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: '/dashboard',
         element: <Dashboard />,
+      },
+      {
+        path: '/dashboard/profile',
+        element: <DashboardProfile />,
       },
     ],
   },

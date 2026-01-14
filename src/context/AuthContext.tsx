@@ -1,16 +1,41 @@
 import { api } from '@/helpers/api';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
+interface Address {
+  street: string;
+  number: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  complement?: string;
+}
+
 interface User {
   id: string;
   name: string;
   email: string;
+  password?: string;
+  avatar?: string | null;
+  document?: string | null;
+  cellPhone?: string | null;
+  birthDate?: string | null;
+  gender?: 'MALE' | 'FEMALE' | string | null;
+  role?: 'USER' | 'ADMIN' | string;
+  isActive?: boolean;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
+  profileCompleted?: boolean;
+  stripeCustomerId?: string | null;
+  address?: Address | null;
 }
 
 interface AuthContextData {
   user: User | null;
   token: string | null;
   signIn: (token: string, user: User) => void;
+  setProfile: (profile: User) => void;
   signOut: () => void;
 }
 
@@ -41,6 +66,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 
+  function setProfile(profile: User) {
+    setUser((prev) => {
+      const merged = { ...(prev ?? {}), ...profile } as User;
+      localStorage.setItem('@app:user', JSON.stringify(merged));
+      return merged;
+    });
+  }
+
   function signOut() {
     setToken(null);
     setUser(null);
@@ -50,7 +83,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, signIn, signOut }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, token, signIn, setProfile, signOut }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 

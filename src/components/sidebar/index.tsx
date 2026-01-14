@@ -6,22 +6,22 @@ import {
   Package,
   Settings,
   ShoppingCart,
-  Users,
+  User,
 } from 'lucide-react';
 import { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { Button } from '../ui/button';
 
 export default function Sidebar() {
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', active: true },
-    { icon: BarChart3, label: 'Análises' },
-    { icon: Users, label: 'Usuários' },
-    { icon: Package, label: 'Produtos' },
-    { icon: ShoppingCart, label: 'Pedidos' },
-    { icon: FileText, label: 'Relatórios' },
-    { icon: Settings, label: 'Configurações' },
+    { icon: LayoutDashboard, label: 'Dashboard', to: '/dashboard' },
+    { icon: BarChart3, label: 'Análises', to: '/dashboard/analises' },
+    { icon: Package, label: 'Produtos', to: '/dashboard/produtos' },
+    { icon: ShoppingCart, label: 'Pedidos', to: '/dashboard/pedidos' },
+    { icon: FileText, label: 'Relatórios', to: '/dashboard/relatorios' },
+    { icon: Settings, label: 'Configurações', to: '/dashboard/configuracoes' },
   ];
 
   return (
@@ -48,32 +48,46 @@ export default function Sidebar() {
 
       <nav className="flex-1 py-4">
         {menuItems.map((item, index) => (
-          <button
+          <NavLink
             key={index}
-            className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${
-              item.active
-                ? 'bg-sidebar-accent text-sidebar-accent-foreground border-l-4 border-sidebar-primary'
-                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-            }`}
+            to={item.to}
+            className={({ isActive }) =>
+              `w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                isActive
+                  ? 'bg-sidebar-accent text-sidebar-accent-foreground border-l-4 border-sidebar-primary'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:border-l-4 hover:border-sidebar-primary'
+              }`
+            }
           >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <item.icon className="h-5 w-5 shrink-0" />
             {sidebarExpanded && <span className="font-medium text-sm">{item.label}</span>}
-          </button>
+          </NavLink>
         ))}
       </nav>
 
       {sidebarExpanded && (
-        <div className="p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary font-semibold">
-              U
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-secondary">Usuário</p>
-              <p className="text-xs text-secondary">user@email.com</p>
+        <>
+          <div className=" pb-2">
+            <NavLink
+              to="/dashboard/profile"
+              className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:border-l-4 hover:border-sidebar-primary"
+            >
+              <User className="h-5 w-5 shrink-0" />
+              <span className="font-medium text-sm">Profile</span>
+            </NavLink>
+          </div>
+          <div className="p-4 border-t border-accent-foreground">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-secondary font-semibold">
+                U
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-secondary">Usuário</p>
+                <p className="text-xs text-secondary">user@email.com</p>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
     </aside>
   );
