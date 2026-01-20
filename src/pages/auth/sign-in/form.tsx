@@ -36,7 +36,7 @@ export default function SignInForm() {
           Esqueceu sua senha?{' '}
           <Link
             to="/forgot-password"
-            className="font-medium underline underline-offset-4 hover:text-foreground"
+            className="font-bold text-accents-6 underline underline-offset-4 hover:text-foreground"
           >
             Recuperar
           </Link>
@@ -47,7 +47,7 @@ export default function SignInForm() {
             <span className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">Ou continue com</span>
+            <span className="bg-accent px-2 py-1 text-white">Ou continue com</span>
           </div>
         </div>
 

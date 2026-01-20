@@ -11,7 +11,10 @@ export default function AuthPrompt({ message, linkText, linkTo, className }: Aut
   return (
     <p className={`text-center text-sm text-muted-foreground ${className ?? ''}`}>
       {message}{' '}
-      <Link to={linkTo} className="font-medium underline underline-offset-4 hover:text-foreground">
+      <Link
+        to={linkTo}
+        className="font-bold text-accents-6 underline underline-offset-4 hover:text-foreground"
+      >
         {linkText}
       </Link>
     </p>

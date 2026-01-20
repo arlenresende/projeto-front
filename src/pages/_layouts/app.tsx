@@ -8,15 +8,15 @@ import { Outlet } from 'react-router';
 
 export function AppLayout() {
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-[#f4f3f3]">
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-card">
+        <header className="h-16 text-black  flex items-center justify-between px-6 bg-[#fde3c9]">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
-            <Search className="h-5 w-5 text-muted-foreground" />
+            <Search className="h-5 w-5 " />
             <Input
               placeholder="Pesquisar..."
-              className="border-0 focus-visible:ring-0 bg-transparent"
+              className="border rounded-none placeholder:text-black border-black border-t-0  border-l-0 border-r-0 focus-visible:ring-0 bg-transparent text-black"
             />
           </div>
           <div className="flex items-center gap-3">

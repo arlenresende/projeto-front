@@ -11,14 +11,22 @@ const cepRegex = /^\d{5}-?\d{3}$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 const addressSchema = z.object({
-  street: z.string().min(1, { message: 'Rua obrigatória' }),
+  street: z.string().optional(),
   number: z.string().optional(),
   neighborhood: z.string().optional(),
   city: z.string().optional(),
-  state: z.string().min(2, { message: 'Estado deve ter ao menos 2 caracteres' }),
+  state: z
+    .string()
+    .optional()
+    .refine((val) => !val || val.length >= 2, {
+      message: 'Estado deve ter ao menos 2 caracteres',
+    }),
   zip_code: z
     .string()
-    .regex(cepRegex, { message: 'CEP deve estar no formato 00000-000 ou 00000000' }),
+    .optional()
+    .refine((val) => !val || cepRegex.test(val), {
+      message: 'CEP deve estar no formato 00000-000 ou 00000000',
+    }),
   country: z.string().optional(),
   complement: z.string().optional(),
 });
@@ -26,7 +34,6 @@ const addressSchema = z.object({
 const schema = z.object({
   name: z.string().min(1, { message: 'Nome obrigatório' }),
   email: z.string().email({ message: 'E-mail inválido' }),
-  password: z.string().optional(),
   avatar: z.string().url({ message: 'URL inválida' }).nullable().optional(),
   document: z
     .string()
@@ -38,8 +45,7 @@ const schema = z.object({
   cellPhone: z
     .string()
     .transform((s) => s.replace(/\D/g, ''))
-    .optional()
-    .refine((val) => !val || /^\d{10,11}$/.test(val), {
+    .refine((val) => /^\d{10,11}$/.test(val), {
       message: 'Celular deve ter 10 ou 11 dígitos',
     }),
   birthDate: z
@@ -51,10 +57,6 @@ const schema = z.object({
   gender: z.enum(['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'], {
     message: 'Opção inválida: esperado uma de "MALE"|"FEMALE"|"OTHER"|"PREFER_NOT_TO_SAY"',
   }),
-  role: z.string().optional(),
-  isActive: z.boolean().optional(),
-  emailVerified: z.boolean().optional(),
-  phoneVerified: z.boolean().optional(),
   address: addressSchema.optional(),
 });
 
@@ -68,16 +70,11 @@ export default function dashboardProfileController() {
     return {
       name: user?.name ?? '',
       email: user?.email ?? '',
-      password: '',
       avatar: user?.avatar ?? null,
       document: user?.document ?? undefined,
-      cellPhone: user?.cellPhone ?? undefined,
+      cellPhone: user?.cellPhone ?? '',
       birthDate: user?.birthDate ?? undefined,
-      gender: (user?.gender as FormData['gender']) ?? undefined,
-      role: user?.role ?? undefined,
-      isActive: user?.isActive ?? true,
-      emailVerified: user?.emailVerified ?? false,
-      phoneVerified: user?.phoneVerified ?? false,
+      gender: (user?.gender as FormData['gender']) ?? 'PREFER_NOT_TO_SAY',
       address: user?.address
         ? {
             street: user.address.street ?? '',
@@ -135,16 +132,11 @@ export default function dashboardProfileController() {
       const payload: UpdateProfilePayload = {
         name: data.name,
         email: data.email,
-        password: data.password || undefined,
         avatar: data.avatar ?? null,
         document: sanitizedDocument,
         cellPhone: sanitizedCell,
         birthDate: data.birthDate,
         gender: data.gender,
-        role: data.role,
-        isActive: data.isActive,
-        emailVerified: data.emailVerified,
-        phoneVerified: data.phoneVerified,
         address: addressAllBlank
           ? null
           : {

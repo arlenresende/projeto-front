@@ -1,47 +1,43 @@
 @import 'tailwindcss';
 
 @theme inline {
-  /* Base (White) */
-  --color-background: #f8faf9;
-  --color-foreground: #2f362f;
+  --color-background: #d8d9d0;
+  --color-foreground: #111410;
 
-  /* Superfícies (Sand Dollar + White) */
-  --color-card: #f8faf9;
-  --color-card-foreground: #2f362f;
+  --color-card: #d8d9d0;
+  --color-card-foreground: #111410;
 
-  --color-popover: #f8faf9;
-  --color-popover-foreground: #2f362f;
+  --color-popover: #d8d9d0;
+  --color-popover-foreground: #111410;
 
-  /* Primary (Ebony) */
-  --color-primary: #2f362f;
-  --color-primary-foreground: #f8faf9;
+  /* Primary — Ivory */
+  --color-primary: #d8d9d0;
+  --color-primary-foreground: #111410;
 
-  /* Secondary (Celadon) */
-  --color-secondary: #788978;
-  --color-secondary-foreground: #f8faf9;
+  /* Secondary — Tiffany Blue */
+  --color-secondary: #2897b0;
+  --color-secondary-foreground: #ffffff;
 
-  /* Muted (Sand Dollar) */
-  --color-muted: #d9d3c6;
-  --color-muted-foreground: #2f362f;
+  /* Muted — Ivory escurecido */
+  --color-muted: #c7c8bf;
+  --color-muted-foreground: #111410;
 
-  /* Accent (um pouco mais vivo do Celadon) */
-  --color-accent: #788978;
-  --color-accent-foreground: #f8faf9;
+  /* Accent — Desert Sun */
+  --color-accent: #550c72;
+  --color-accent-foreground: #111410;
 
-  /* Destructive (mantido padrão) */
   --color-destructive: #dc2626;
 
-  /* Contornos e foco */
-  --color-border: #d9d3c6;
-  --color-input: #d9d3c6;
-  --color-ring: #788978;
+  --color-border: #bfc0b8;
+  --color-input: #bfc0b8;
+  --color-ring: #2897b0;
 
-  /* Charts (tons derivados do Celadon/Ebony/Sand) */
-  --color-chart-1: #788978; /* celadon */
-  --color-chart-2: #5f6f5f; /* celadon escuro */
-  --color-chart-3: #2f362f; /* ebony */
-  --color-chart-4: #d9d3c6; /* sand */
-  --color-chart-5: #9aa79a; /* celadon claro */
+  /* Charts */
+  --color-chart-1: #2897b0;
+  --color-chart-2: #d18c30;
+  --color-chart-3: #111410;
+  --color-chart-4: #d8d9d0;
+  --color-chart-5: #8fc6d3;
 }
 
 :root {
