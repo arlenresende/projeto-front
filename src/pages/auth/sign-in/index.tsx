@@ -1,11 +1,11 @@
-import AuthPrompt from '@/components/auth/authPrompt';
-import SignInForm from './form.tsx';
+import { Helmet } from 'react-helmet-async';
+import SignInForm from './form';
 
 export default function SignIn() {
   return (
     <>
+      <Helmet title="Entrar | Cataloguei" />
       <SignInForm />
-      <AuthPrompt message="Não tem uma conta?" linkText="Cadastre-se" linkTo="/register" />
     </>
   );
 }

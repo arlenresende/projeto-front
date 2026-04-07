@@ -1,36 +1,45 @@
-import { Outlet } from 'react-router';
-import Logo from '../app/components/Logo';
+import { ShoppingBag } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
 
 export function AuthLayout() {
   return (
     <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:w-1/3 bg-accent text-white flex-col justify-between p-12">
+      {/* Left Sidebar - Branding Panel */}
+      <div className="hidden lg:flex lg:w-1/3 bg-gradient-to-br from-primary to-primary/80 text-white flex-col justify-between p-12">
+        {/* Logo */}
         <div className="flex items-center gap-2">
-          <Logo url="/" />
+          <a href="/" className="flex items-center gap-2">
+            <ShoppingBag size={32} />
+            <span className="text-2xl font-bold">Cataloguei</span>
+          </a>
         </div>
 
-        <div className="space-y-4">
-          <blockquote className="text-lg font-medium text-balance">
-            "Esta plataforma transformou completamente a forma como gerenciamos nosso negócio."
+        {/* Testimonial */}
+        <div className="space-y-4 max-w-md">
+          <blockquote className="text-lg font-medium text-balance leading-relaxed">
+            "Esta plataforma transformou completamente a forma como gerenciamos nosso negócio.
+            Aumentamos nossas vendas em 300% no primeiro mês."
           </blockquote>
-          <div className="text-sm">
-            <p className="font-medium">Maria Silva</p>
-            <p>CEO, Empresa XYZ</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+              MS
+            </div>
+            <div>
+              <p className="font-semibold">Maria Silva</p>
+              <p className="text-sm text-white/80">CEO, Empresa XYZ</p>
+            </div>
           </div>
         </div>
 
-        <div className="text-sm">© 2025 Todos os direitos reservados</div>
+        {/* Footer */}
+        <div className="text-sm text-white/70">
+          © 2025 Cataloguei. Todos os direitos reservados.
+        </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center p-8 bg-[#f4f3f3]">
-        <div className="w-full max-w-md space-y-8">
-          <div className="space-y-2 text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-balance">Bem-vindo de volta</h1>
-            <p className="text-muted-foreground text-balance">
-              Entre com suas credenciais para acessar sua conta
-            </p>
-          </div>
-
+      {/* Right Panel - Auth Forms */}
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 bg-background">
+        <div className="w-full max-w-md">
           <Outlet />
         </div>
       </div>

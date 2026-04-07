@@ -33,15 +33,17 @@ export default function Sidebar() {
     <aside
       className={`${
         sidebarExpanded ? 'w-64' : 'w-20'
-      } text-white bg-accent transition-all duration-300 flex flex-col`}
+      } bg-sidebar text-sidebar-foreground transition-all duration-300 flex flex-col border-r border-sidebar-border`}
     >
-      <div className="h-16 flex items-center justify-between px-4 ">
-        {sidebarExpanded && <span className="font-bold text-xl text-white">Menu</span>}
+      <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border">
+        {sidebarExpanded && (
+          <span className="font-bold text-xl text-sidebar-primary-foreground">Cataloguei</span>
+        )}
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setSidebarExpanded(!sidebarExpanded)}
-          className="text-white hover:bg-sidebar-accent"
+          className="text-sidebar-foreground hover:bg-sidebar-accent"
         >
           <ChevronLeft
             className={`h-5 w-5 transition-transform duration-300 ${!sidebarExpanded ? 'rotate-180' : ''}`}
@@ -50,52 +52,52 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 py-4">
-        {menuItems.map((item, index) => {
-          if (item.to === '/logout') {
-            return (
-              <button
-                key={index}
-                onClick={() => {
-                  signOut();
-                  navigate('/sign-in', { replace: true });
-                }}
-                className="w-full flex items-center gap-3 px-4 py-3 transition-colors text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:border-l-4 hover:border-sidebar-primary text-left"
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {sidebarExpanded && <span className="font-medium text-sm">Sair</span>}
-              </button>
-            );
-          }
-          return (
+        <div className="px-4 mb-2 text-xs tracking-wide uppercase text-muted-foreground">Menu</div>
+        {menuItems.map((item, index) =>
+          item.to === '/logout' ? (
+            <button
+              key={index}
+              onClick={() => {
+                signOut();
+                navigate('/sign-in', { replace: true });
+              }}
+              className="w-full flex items-center gap-3 px-4 py-3 transition-colors hover:bg-sidebar-accent/10 hover:text-sidebar-foreground text-left rounded-md"
+            >
+              <item.icon className="h-5 w-5 shrink-0 text-sidebar-primary" />
+              {sidebarExpanded && <span className="font-medium text-sm">Sair</span>}
+            </button>
+          ) : (
             <NavLink
               key={index}
               to={item.to}
               className={({ isActive }) =>
-                `w-full flex items-center gap-3 px-4 py-3 transition-colors ${
+                `w-full flex items-center gap-3 px-4 py-3 transition-colors rounded-md ${
                   isActive
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground border-l-4 border-sidebar-primary'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:border-l-4 hover:border-sidebar-primary'
+                    ? 'bg-sidebar-accent/20 text-sidebar-foreground'
+                    : 'hover:bg-sidebar-accent/10 hover:text-sidebar-foreground'
                 }`
               }
             >
-              <item.icon className="h-5 w-5 shrink-0" />
+              <item.icon className="h-5 w-5 shrink-0 text-sidebar-primary" />
               {sidebarExpanded && <span className="font-medium text-sm">{item.label}</span>}
             </NavLink>
-          );
-        })}
+          ),
+        )}
       </nav>
 
       {sidebarExpanded && (
         <>
-          <div className=" pb-4 p-4">
-            {' '}
+          <div className="p-4 border-t border-sidebar-border">
+            <div className="px-0 mb-2 text-xs tracking-wide uppercase text-muted-foreground">
+              Account
+            </div>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center  font-semibold">
+              <div className="w-10 h-10 rounded-full bg-sidebar-accent text-sidebar-accent-foreground flex items-center justify-center font-semibold">
                 U
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium ">Usuário</p>
-                <p className="text-xs ">user@email.com</p>
+                <p className="text-sm font-medium">Usuário</p>
+                <p className="text-xs text-muted-foreground">user@email.com</p>
               </div>
             </div>
           </div>

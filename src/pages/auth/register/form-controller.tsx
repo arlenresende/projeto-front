@@ -5,10 +5,13 @@ import { z } from 'zod';
 
 const schema = z
   .object({
-    name: z.string().min(1, { message: 'Nome obrigatório' }),
-    email: z.string().min(1, { message: 'E-mail inválido' }),
+    name: z.string().min(1, { message: 'Nome é obrigatório' }),
+    email: z
+      .string()
+      .min(1, { message: 'E-mail é obrigatório' })
+      .email({ message: 'E-mail inválido' }),
     password: z.string().min(6, { message: 'Senha deve ter ao menos 6 caracteres' }),
-    confirmPassword: z.string().min(6, { message: 'Senha deve ter ao menos 6 caracteres' }),
+    confirmPassword: z.string().min(1, { message: 'Confirme sua senha' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -19,29 +22,26 @@ type FormData = z.infer<typeof schema>;
 
 export default function registerController() {
   const registerMutation = useRegister();
-  const loading = registerMutation.isPending;
+  const isPending = registerMutation.isPending;
 
-  const {
-    handleSubmit: hookFormHandleSubmit,
-    register,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
+  const form = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+    },
   });
 
-  const handleSubmit = hookFormHandleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     const { name, email, password } = data;
     await registerMutation.mutateAsync({ name, email, password });
-  });
+  };
 
   return {
-    handleSubmit,
-    register,
-    errors,
-    control,
-    loading,
-    reset,
+    form,
+    isPending,
+    onSubmit,
   };
 }

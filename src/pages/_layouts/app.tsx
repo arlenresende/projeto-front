@@ -8,19 +8,19 @@ import { Outlet } from 'react-router';
 
 export function AppLayout() {
   return (
-    <div className="flex h-screen bg-[#f4f3f3]">
+    <div className="flex h-screen bg-background">
       <Sidebar />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 text-black  flex items-center justify-between px-6 bg-[#fde3c9]">
+        <header className="h-16 bg-card text-foreground flex items-center justify-between px-6 border-b border-border">
           <div className="flex items-center gap-4 flex-1 max-w-xl">
-            <Search className="h-5 w-5 " />
+            <Search className="h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Pesquisar..."
-              className="border rounded-none placeholder:text-black border-black border-t-0  border-l-0 border-r-0 focus-visible:ring-0 bg-transparent text-black"
+              className="bg-transparent border-0 focus-visible:ring-0 focus-visible:border-0 placeholder:text-muted-foreground text-foreground"
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative text-foreground">
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
             </Button>

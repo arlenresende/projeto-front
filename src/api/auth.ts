@@ -120,8 +120,10 @@ export type UpdateProfileEnvelope = UserProfileEnvelope;
 
 export async function updateProfileRequest(
   id: string,
-  data: UpdateProfilePayload,
+  data: FormData,
 ): Promise<UpdateProfileEnvelope> {
-  const response = await api.patch(`/users/${id}`, data);
+  const response = await api.patch(`/users/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return response.data;
 }

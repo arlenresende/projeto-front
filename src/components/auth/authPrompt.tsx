@@ -9,12 +9,9 @@ interface AuthPromptProps {
 
 export default function AuthPrompt({ message, linkText, linkTo, className }: AuthPromptProps) {
   return (
-    <p className={`text-center text-sm text-muted-foreground ${className ?? ''}`}>
+    <p className={`mt-6 text-center text-sm text-gray-600 ${className ?? ''}`}>
       {message}{' '}
-      <Link
-        to={linkTo}
-        className="font-bold text-accents-6 underline underline-offset-4 hover:text-foreground"
-      >
+      <Link to={linkTo} className="font-medium text-primary hover:underline">
         {linkText}
       </Link>
     </p>

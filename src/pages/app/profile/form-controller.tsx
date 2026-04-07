@@ -1,4 +1,4 @@
-import { updateProfileRequest, type UpdateProfilePayload } from '@/api/auth';
+import { updateProfileRequest } from '@/api/auth';
 import { useAuth } from '@/context/AuthContext';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AxiosError } from 'axios';
@@ -9,6 +9,12 @@ import { z } from 'zod';
 
 const cepRegex = /^\d{5}-?\d{3}$/;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+function toDateOnly(input?: string | null) {
+  if (!input) return undefined;
+  const match = input.match(/^\d{4}-\d{2}-\d{2}/);
+  return match ? match[0] : undefined;
+}
 
 const addressSchema = z.object({
   street: z.string().optional(),
@@ -34,7 +40,7 @@ const addressSchema = z.object({
 const schema = z.object({
   name: z.string().min(1, { message: 'Nome obrigatório' }),
   email: z.string().email({ message: 'E-mail inválido' }),
-  avatar: z.string().url({ message: 'URL inválida' }).nullable().optional(),
+  avatar: z.any().optional(),
   document: z
     .string()
     .transform((s) => s.replace(/\D/g, ''))
@@ -70,10 +76,10 @@ export default function dashboardProfileController() {
     return {
       name: user?.name ?? '',
       email: user?.email ?? '',
-      avatar: user?.avatar ?? null,
+      avatar: undefined,
       document: user?.document ?? undefined,
       cellPhone: user?.cellPhone ?? '',
-      birthDate: user?.birthDate ?? undefined,
+      birthDate: toDateOnly(user?.birthDate) ?? undefined,
       gender: (user?.gender as FormData['gender']) ?? 'PREFER_NOT_TO_SAY',
       address: user?.address
         ? {
@@ -103,6 +109,7 @@ export default function dashboardProfileController() {
     handleSubmit: hookFormHandleSubmit,
     register,
     setValue,
+    control,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -129,32 +136,46 @@ export default function dashboardProfileController() {
         !(addressInput?.country?.trim() ?? '') &&
         !(addressInput?.complement?.trim() ?? '');
 
-      const payload: UpdateProfilePayload = {
-        name: data.name,
-        email: data.email,
-        avatar: data.avatar ?? null,
-        document: sanitizedDocument,
-        cellPhone: sanitizedCell,
-        birthDate: data.birthDate,
-        gender: data.gender,
-        address: addressAllBlank
-          ? null
-          : {
-              street: trimmedStreet,
-              number: addressInput?.number,
-              neighborhood: addressInput?.neighborhood,
-              city: addressInput?.city,
-              state: trimmedState,
-              zip_code: trimmedZip,
-              country: addressInput?.country,
-              complement: addressInput?.complement,
-            },
-      };
+      const formData = new FormData();
+      formData.append('name', data.name);
+      formData.append('email', data.email);
+      if (data.avatar instanceof File) {
+        formData.append('avatar', data.avatar);
+      } else if (data.avatar instanceof FileList && data.avatar.length > 0) {
+        formData.append('avatar', data.avatar[0]);
+      }
+      if (sanitizedDocument) {
+        formData.append('document', sanitizedDocument);
+      }
+      if (sanitizedCell) {
+        formData.append('cellPhone', sanitizedCell);
+      }
+      if (data.birthDate) {
+        formData.append('birthDate', `${data.birthDate}T00:00:00.000Z`);
+      }
+      if (data.gender) {
+        formData.append('gender', data.gender);
+      }
+      if (!addressAllBlank) {
+        formData.append(
+          'address',
+          JSON.stringify({
+            street: trimmedStreet,
+            number: addressInput?.number,
+            neighborhood: addressInput?.neighborhood,
+            city: addressInput?.city,
+            state: trimmedState,
+            zip_code: trimmedZip,
+            country: addressInput?.country,
+            complement: addressInput?.complement,
+          }),
+        );
+      }
 
       if (!user?.id) {
         throw new Error('Usuário não identificado');
       }
-      const res = await updateProfileRequest(user.id, payload);
+      const res = await updateProfileRequest(user.id, formData);
       setProfile(res.data);
       toast.success('Perfil atualizado com sucesso', { className: '!bg-green-400 !text-white' });
     } catch (error) {
@@ -171,6 +192,7 @@ export default function dashboardProfileController() {
     handleSubmit,
     register,
     setValue,
+    control,
     errors,
     loading,
   };

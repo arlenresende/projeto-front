@@ -1,40 +1,37 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-
 import { useLogin } from '@/hooks/useLogin';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const schema = z.object({
-  email: z.string().min(1, { message: 'Email obrigatório' }),
-  password: z.string().min(1, { message: 'Senha obrigatória' }),
+  email: z
+    .string()
+    .min(1, { message: 'E-mail é obrigatório' })
+    .email({ message: 'E-mail inválido' }),
+  password: z.string().min(1, { message: 'Senha é obrigatória' }),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export default function signInController() {
   const loginMutation = useLogin();
-  const loading = loginMutation.isPending;
+  const isPending = loginMutation.isPending;
 
-  const {
-    handleSubmit: hookFormHandleSubmit,
-    register,
-    control,
-    reset,
-    formState: { errors },
-  } = useForm<FormData>({
+  const form = useForm<FormData>({
     resolver: zodResolver(schema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
 
-  const handleSubmit = hookFormHandleSubmit(async (data) => {
+  const onSubmit = async (data: FormData) => {
     await loginMutation.mutateAsync(data);
-  });
+  };
 
   return {
-    handleSubmit,
-    register,
-    errors,
-    control,
-    loading,
-    reset,
+    form,
+    isPending,
+    onSubmit,
   };
 }

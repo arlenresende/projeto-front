@@ -11,7 +11,9 @@ export default function Form() {
         <Input label="Nome" {...register('name')} error={errors.name?.message} />
         <Input label="E-mail" {...register('email')} error={errors.email?.message} />
         <Input
-          label="Avatar URL"
+          type="file"
+          accept="image/*"
+          label="Imagem de perfil"
           {...register('avatar')}
           error={errors.avatar?.message as string | undefined}
         />

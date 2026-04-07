@@ -1,44 +1,50 @@
+import { loginRequest, profileRequest, type LoginPayload, type LoginResponse } from '@/api/auth';
 import { useAuth } from '@/context/AuthContext';
 import { useMutation } from '@tanstack/react-query';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
-import { loginRequest, profileRequest, type LoginPayload, type LoginResponse } from '../api/auth';
+
+interface ApiEnvelope<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp: string;
+}
 
 export function useLogin() {
   const { signIn, setProfile } = useAuth();
-
-  type ApiEnvelope<T> = {
-    success: boolean;
-    message: string;
-    data: T;
-    timestamp: string;
-  };
 
   return useMutation<LoginResponse, AxiosError<ApiEnvelope<unknown>>, LoginPayload>({
     mutationFn: loginRequest,
     onSuccess: async (data) => {
       signIn(data.token, data.user);
+
       try {
-        const res = await profileRequest();
-        setProfile(res.data);
+        const profileResponse = await profileRequest();
+        if (profileResponse?.data) {
+          setProfile(profileResponse.data);
+        }
       } catch (error) {
-        console.log('Erro ao buscar perfil', error);
+        console.error('Erro ao buscar perfil do usuário:', error);
       }
-      toast.success('Login realizado com sucesso', {
-        className: '!bg-green-400 !text-white',
-      });
+
+      toast.success('Login realizado com sucesso!');
     },
-
-    onError: (error) => {
-      const apiMessage = error.response?.data?.message ?? null;
+    onError: (error: AxiosError<ApiEnvelope<unknown>>) => {
       const status = error.response?.status;
-      const isInvalidCreds =
-        status === 401 || (apiMessage ? /invalid credentials/i.test(apiMessage) : false);
-      const toastMessage: string | null = isInvalidCreds ? 'Invalid credentials' : null;
+      const apiMessage = error.response?.data?.message ?? '';
 
-      toast.error(toastMessage, {
-        className: '!bg-red-400 !text-white',
-      });
+      if (status === 401 || /invalid credentials/i.test(apiMessage)) {
+        toast.error('E-mail ou senha incorretos. Tente novamente.');
+      } else if (status === 429) {
+        toast.error('Muitas tentativas. Aguarde um momento e tente novamente.');
+      } else if (status && status >= 500) {
+        toast.error('Erro no servidor. Tente novamente em alguns instantes.');
+      } else if (status === 0 || !status) {
+        toast.error('Sem conexão com a internet. Verifique sua rede.');
+      } else {
+        toast.error(apiMessage || 'Erro ao fazer login. Tente novamente.');
+      }
     },
   });
 }
