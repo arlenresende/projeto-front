@@ -36,6 +36,7 @@ interface AuthContextData {
   token: string | null;
   signIn: (token: string, user: User) => void;
   setProfile: (profile: User) => void;
+  updateUserProfile: (data: Partial<User>) => void;
   signOut: () => void;
 }
 
@@ -74,6 +75,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }
 
+  function updateUserProfile(data: Partial<User>) {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...data };
+      localStorage.setItem('@app:user', JSON.stringify(updated));
+      return updated;
+    });
+  }
+
   function signOut() {
     setToken(null);
     setUser(null);
@@ -83,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, signIn, setProfile, signOut }}>
+    <AuthContext.Provider value={{ user, token, signIn, setProfile, updateUserProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );

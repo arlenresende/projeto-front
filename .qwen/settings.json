@@ -1,6 +1,10 @@
 {
   "permissions": {
-    "allow": ["Bash(ls *)", "Bash(npm run *)"]
+    "allow": [
+      "Bash(ls *)",
+      "Bash(npm run *)",
+      "Bash(git add *)"
+    ]
   },
   "$version": 3
 }

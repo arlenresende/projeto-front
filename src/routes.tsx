@@ -4,10 +4,11 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 import { AppLayout } from './pages/_layouts/app';
 import { AuthLayout } from './pages/_layouts/auth';
+import Dashboard from './pages/app/dashboard';
 import DashboardProfile from './pages/app/profile';
 import ForgotPassword from './pages/auth/forgot-password';
-import RegisterForm from './pages/auth/register/form';
-import SignInForm from './pages/auth/sign-in/form';
+import Register from './pages/auth/register';
+import SignIn from './pages/auth/sign-in';
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { token } = useAuth();
@@ -30,18 +31,9 @@ export const router = createBrowserRouter([
       </RequireAuth>
     ),
     children: [
-      {
-        path: '/',
-        element: <DashboardProfile />,
-      },
-      {
-        path: '/dashboard',
-        element: <DashboardProfile />,
-      },
-      {
-        path: '/dashboard/profile',
-        element: <DashboardProfile />,
-      },
+      { path: '/', element: <Dashboard /> },
+      { path: '/dashboard', element: <Dashboard /> },
+      { path: '/dashboard/profile', element: <DashboardProfile /> },
     ],
   },
   {
@@ -52,8 +44,8 @@ export const router = createBrowserRouter([
       </RedirectIfAuth>
     ),
     children: [
-      { path: '/sign-in', element: <SignInForm /> },
-      { path: '/register', element: <RegisterForm /> },
+      { path: '/sign-in', element: <SignIn /> },
+      { path: '/register', element: <Register /> },
       { path: '/forgot-password', element: <ForgotPassword /> },
     ],
   },

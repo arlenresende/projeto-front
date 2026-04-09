@@ -4,20 +4,16 @@ import Form from './form';
 
 export default function DashboardProfile() {
   return (
-    <main className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <PageHeader title="Meu Perfil" description="Atualize seus dados de conta." />
-          <Card className="border-0 bg-trasparent">
-            <CardHeader>
-              <CardTitle className="text-foreground">Informações do Perfil</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form />
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </main>
+    <div className="p-4 lg:p-6 space-y-6 animate-fade-in">
+      <PageHeader title="Meu Perfil" description="Atualize seus dados de conta." />
+      <Card className="border-gray-200 dark:border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">Informações do Perfil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form />
+        </CardContent>
+      </Card>
+    </div>
   );
 }

@@ -20,7 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </Label>
         <div className="relative">
           {isSlug && (
-            <span className="w-[150px] border border-r-0 flex items-center text-sm text-[#262d34] font-medium absolute top-0 left-0 bg-orange-100 px-2 h-full rounded-l-lg">
+            <span className="w-[150px] border border-r-0 flex items-center text-sm text-white font-medium absolute top-0 left-0 bg-[#465fff] px-2 h-full rounded-l-lg">
               cataloguei.com.br/
             </span>
           )}

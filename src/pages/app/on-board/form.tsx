@@ -26,7 +26,7 @@ export default function Form({ activeConfetti }: FormProps) {
 
       <Button
         variant={'default'}
-        className="bg-[#DD6E42] hover:bg-[#DD6E42]/90 w-full"
+        className="bg-[#3451e6] hover:bg-[#3451e6]/90 w-full"
         disabled={isSubmitting}
       >
         {isSubmitting ? <Loader2 className="animate-spin" /> : 'Criar minha loja'}

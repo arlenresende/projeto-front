@@ -1,350 +1,419 @@
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 import type { ApexOptions } from 'apexcharts';
-import { BadgeCheck, TrendingDown, TrendingUp } from 'lucide-react';
+import {
+  ArrowDownRight,
+  ArrowUpRight,
+  DollarSign,
+  Loader2,
+  Package,
+  ShoppingCart,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { Navigate } from 'react-router-dom';
-import CountryMap from '../../../../tema/src/components/ecommerce/CountryMap';
-import PageHeader from '../components/page-header';
+import CountryMap from '../components/countryMap';
 import OnBoard from '../on-board';
 
-export default function Dashboard() {
-  const { user } = useAuth();
+// --- Skeleton ---
+function SkeletonCard() {
+  return (
+    <Card className="border-gray-200 dark:border-gray-800">
+      <CardHeader className="pb-2">
+        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </CardHeader>
+      <CardContent>
+        <div className="h-8 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </CardContent>
+    </Card>
+  );
+}
 
-  if (!user) return <Navigate to="/sign-in" replace />;
+// --- Stat Card ---
+interface StatCardProps {
+  title: string;
+  value: string;
+  change: string;
+  trend: 'up' | 'down' | 'neutral';
+  icon: React.ComponentType<{ className?: string }>;
+}
 
-  if (!user.profileCompleted) return <OnBoard />;
+function StatCard({ title, value, change, trend, icon: Icon }: StatCardProps) {
+  const trendColor =
+    trend === 'up'
+      ? 'text-emerald-600 dark:text-emerald-400'
+      : trend === 'down'
+        ? 'text-red-600 dark:text-red-400'
+        : 'text-gray-600 dark:text-gray-400';
 
-  const monthlySalesOptions: ApexOptions = {
-    colors: ['#465fff'],
-    chart: {
-      fontFamily: 'Outfit, sans-serif',
-      type: 'bar',
-      height: 180,
-      toolbar: { show: false },
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-        columnWidth: '39%',
-        borderRadius: 5,
-        borderRadiusApplication: 'end',
-      },
-    },
-    dataLabels: { enabled: false },
-    stroke: { show: true, width: 4, colors: ['transparent'] },
-    xaxis: {
-      categories: [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ],
-      axisBorder: { show: false },
-      axisTicks: { show: false },
-    },
-    legend: {
-      show: true,
-      position: 'top',
-      horizontalAlign: 'left',
-    },
-    yaxis: { title: { text: undefined } },
-    grid: { yaxis: { lines: { show: true } } },
-    fill: { opacity: 1 },
-    tooltip: {
-      x: { show: false },
-      y: { formatter: (val: number) => `${val}` },
-    },
-  };
-
-  const monthlySalesSeries = [
-    { name: 'Sales', data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112] },
-  ];
+  const TrendIcon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : null;
 
   return (
-    <main className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-7xl mx-auto space-y-8">
-          <div className="text-xs text-muted-foreground">Dashboard / eCommerce</div>
-          <PageHeader title="eCommerce" description="Resumo de performance da sua operação" />
+    <Card className="border-gray-200 dark:border-gray-800 hover:shadow-md transition-shadow">
+      <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+        <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          {title}
+        </CardTitle>
+        <div className="w-9 h-9 rounded-lg bg-[#465fff]/10 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-[#465fff]" />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold text-gray-900 dark:text-white">{value}</div>
+        <div className={`flex items-center gap-1 mt-1 text-sm ${trendColor}`}>
+          {TrendIcon && <TrendIcon className="h-4 w-4" />}
+          <span>{change}</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Customers</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-foreground">3,782</p>
-                  <span className="flex items-center gap-1 text-chart-1 text-sm">
-                    <TrendingUp className="h-4 w-4" /> 11.01%
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-foreground">5,359</p>
-                  <span className="flex items-center gap-1 text-chart-1 text-sm">
-                    <TrendingUp className="h-4 w-4" /> 9.05%
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Revenue</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-foreground">$32,870</p>
-                  <span className="flex items-center gap-1 text-destructive text-sm">
-                    <TrendingDown className="h-4 w-4" /> 2.15%
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm text-muted-foreground">Product Sold</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-end justify-between">
-                  <p className="text-3xl font-bold text-foreground">1,348</p>
-                  <span className="flex items-center gap-1 text-chart-1 text-sm">
-                    <TrendingUp className="h-4 w-4" /> 3.18%
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+// --- Order Status Badge ---
+function OrderStatusBadge({ status }: { status: string }) {
+  const config: Record<
+    string,
+    { variant: 'success' | 'warning' | 'destructive' | 'default' | 'secondary'; label: string }
+  > = {
+    delivered: { variant: 'success', label: 'Entregue' },
+    pending: { variant: 'warning', label: 'Pendente' },
+    canceled: { variant: 'destructive', label: 'Cancelado' },
+    shipped: { variant: 'default', label: 'Enviado' },
+  };
 
-          <Card className="mt-2">
-            <CardHeader className="pb-2">
-              <CardTitle>Monthly Sales</CardTitle>
-              <CardDescription>Vendas por mês no ano</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Chart
-                options={monthlySalesOptions}
-                series={monthlySalesSeries}
-                type="bar"
-                height={180}
-              />
-            </CardContent>
-          </Card>
+  const { variant, label } = config[status.toLowerCase()] ?? {
+    variant: 'secondary',
+    label: status,
+  };
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-2">
-                <CardTitle>Monthly Target</CardTitle>
-                <CardDescription>Target you’ve set for each month</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
-                  <span className="text-sm font-medium text-chart-1 flex items-center gap-2">
-                    +10% <BadgeCheck className="h-4 w-4 text-chart-1" />
-                  </span>
-                  <p className="text-sm text-muted-foreground">
-                    You earn $3287 today, it's higher than last month. Keep up your good work!
+  return <Badge variant={variant}>{label}</Badge>;
+}
+
+// --- Main Dashboard ---
+export default function Dashboard() {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!user) return <Navigate to="/sign-in" replace />;
+  if (!user.profileCompleted) return <OnBoard />;
+
+  const chartOptions: ApexOptions = useMemo(
+    () => ({
+      colors: ['#465fff'],
+      chart: {
+        fontFamily: 'inherit',
+        type: 'bar',
+        height: 280,
+        toolbar: { show: false },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '45%',
+          borderRadius: 6,
+          borderRadiusApplication: 'end' as const,
+        },
+      },
+      dataLabels: { enabled: false },
+      stroke: { show: true, width: 4, colors: ['transparent'] },
+      xaxis: {
+        categories: [
+          'Jan',
+          'Fev',
+          'Mar',
+          'Abr',
+          'Mai',
+          'Jun',
+          'Jul',
+          'Ago',
+          'Set',
+          'Out',
+          'Nov',
+          'Dez',
+        ],
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+      },
+      legend: { show: false },
+      yaxis: { title: { text: undefined } },
+      grid: {
+        yaxis: { lines: { show: true } },
+        stroke: { width: 0 },
+      },
+      fill: { opacity: 1 },
+      tooltip: {
+        x: { show: false },
+        y: { formatter: (val: number) => `R$ ${val.toLocaleString('pt-BR')}` },
+      },
+      states: {
+        hover: { filter: { type: 'darken' as const, value: 0.8 } },
+      },
+    }),
+    [],
+  );
+
+  const chartSeries = useMemo(
+    () => [{ name: 'Vendas', data: [168, 385, 201, 298, 187, 195, 291, 110, 215, 390, 280, 112] }],
+    [],
+  );
+
+  const orders = useMemo(
+    () => [
+      {
+        product: 'Macbook Pro 13"',
+        category: 'Notebook',
+        price: 'R$ 12.499',
+        status: 'delivered',
+      },
+      {
+        product: 'Apple Watch Ultra',
+        category: 'Relógio',
+        price: 'R$ 7.899',
+        status: 'pending',
+      },
+      {
+        product: 'iPhone 15 Pro Max',
+        category: 'Smartphone',
+        price: 'R$ 9.999',
+        status: 'delivered',
+      },
+      {
+        product: 'iPad Pro 3ª Gen',
+        category: 'Tablet',
+        price: 'R$ 8.499',
+        status: 'canceled',
+      },
+      {
+        product: 'AirPods Pro 2ª Gen',
+        category: 'Acessório',
+        price: 'R$ 1.899',
+        status: 'shipped',
+      },
+    ],
+    [],
+  );
+
+  if (loading) {
+    return (
+      <div className="p-4 lg:p-6 space-y-6 animate-fade-in">
+        <div className="space-y-2">
+          <div className="h-7 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-4 w-72 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardContent className="h-72 flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 lg:p-6 space-y-6 animate-fade-in">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          Resumo de performance da sua operação
+        </p>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Clientes"
+          value="3.782"
+          change="+11,01% vs mês anterior"
+          trend="up"
+          icon={Users}
+        />
+        <StatCard
+          title="Pedidos"
+          value="5.359"
+          change="+9,05% vs mês anterior"
+          trend="up"
+          icon={ShoppingCart}
+        />
+        <StatCard
+          title="Receita"
+          value="R$ 32.870"
+          change="-2,15% vs mês anterior"
+          trend="down"
+          icon={DollarSign}
+        />
+        <StatCard
+          title="Produtos Vendidos"
+          value="1.348"
+          change="+3,18% vs mês anterior"
+          trend="up"
+          icon={Package}
+        />
+      </div>
+
+      {/* Sales Chart */}
+      <Card className="border-gray-200 dark:border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">Vendas Mensais</CardTitle>
+          <CardDescription>Performance de vendas no último ano</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Chart options={chartOptions} series={chartSeries} type="bar" height={280} />
+        </CardContent>
+      </Card>
+
+      {/* Targets & Demographics Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Monthly Target */}
+        <Card className="lg:col-span-2 border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">Meta Mensal</CardTitle>
+            <CardDescription>Progresso da sua meta para este mês</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg border border-[#465fff]/20 bg-[#465fff]/5 dark:bg-[#465fff]/10 px-4 py-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5">
+                  <TrendingUp className="h-5 w-5 text-[#465fff]" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#465fff]">+10% acima da meta</p>
+                  <p className="text-sm text-[#465fff]/80 mt-0.5">
+                    Você faturou R$ 3.287 hoje. Continue com o ótimo trabalho!
                   </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-muted-foreground">Target</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-2xl font-bold text-foreground">$20K</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-muted-foreground">Revenue</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-2xl font-bold text-foreground">$20K</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm text-muted-foreground">Today</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-2xl font-bold text-foreground">$20K</p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <Card className="border-gray-200 dark:border-gray-800">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs text-gray-500 dark:text-gray-400">Meta</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">R$ 20K</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gray-200 dark:border-gray-800">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs text-gray-500 dark:text-gray-400">
+                    Receita
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">R$ 22K</p>
+                </CardContent>
+              </Card>
+              <Card className="border-gray-200 dark:border-gray-800">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xs text-gray-500 dark:text-gray-400">Hoje</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">R$ 3.2K</p>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle>Statistics</CardTitle>
-                <CardDescription>Target you’ve set for each month</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground">January</div>
-                <div className="mt-2 grid grid-cols-7 gap-1 text-xs text-muted-foreground">
-                  <span>Sun</span>
-                  <span>Mon</span>
-                  <span>Tue</span>
-                  <span>Wed</span>
-                  <span>Thu</span>
-                  <span>Fri</span>
-                  <span>Sat</span>
+        {/* Demographics */}
+        <Card className="border-gray-200 dark:border-gray-800">
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">Demografia</CardTitle>
+            <CardDescription>Clientes por país</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="h-[160px] rounded-lg overflow-hidden">
+              <CountryMap />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="text-gray-700 dark:text-gray-300">Brasil</span>
+                  <span className="text-gray-500 dark:text-gray-400">2.379 clientes</span>
                 </div>
-                <div className="mt-2 grid grid-cols-7 gap-1">
-                  {Array.from({ length: 42 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="aspect-square rounded-md border border-border bg-card text-center text-xs text-muted-foreground flex items-center justify-center"
-                    >
-                      {i + 1}
-                    </div>
-                  ))}
+                <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800">
+                  <div className="h-2 rounded-full bg-[#465fff]" style={{ width: '79%' }} />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle>Customers Demographic</CardTitle>
-                <CardDescription>Number of customer based on country</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="rounded-lg border border-border bg-card px-4 py-3">
-                  <div className="w-full overflow-hidden">
-                    <div className="h-[220px]">
-                      <CountryMap />
-                    </div>
-                  </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="text-gray-700 dark:text-gray-300">EUA</span>
+                  <span className="text-gray-500 dark:text-gray-400">589 clientes</span>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-foreground">USA</span>
-                    <span className="text-xs text-muted-foreground">2,379 Customers</span>
-                  </div>
-                  <div className="h-2 rounded-md bg-muted">
-                    <div className="h-2 rounded-md bg-chart-1" style={{ width: '79%' }} />
-                  </div>
-                  <span className="text-xs text-muted-foreground">79%</span>
+                <div className="h-2 rounded-full bg-gray-100 dark:bg-gray-800">
+                  <div className="h-2 rounded-full bg-emerald-500" style={{ width: '23%' }} />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-foreground">France</span>
-                    <span className="text-xs text-muted-foreground">589 Customers</span>
-                  </div>
-                  <div className="h-2 rounded-md bg-muted">
-                    <div className="h-2 rounded-md bg-chart-2" style={{ width: '23%' }} />
-                  </div>
-                  <span className="text-xs text-muted-foreground">23%</span>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-2">
-                <CardTitle>Recent Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-4 gap-2 text-xs text-muted-foreground">
-                  <span>Products</span>
-                  <span>Category</span>
-                  <span>Price</span>
-                  <span>Status</span>
-                </div>
-                <div className="mt-3 space-y-3 text-sm">
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-md bg-muted" />
-                      <div>
-                        <div className="font-medium text-foreground">Macbook pro 13”</div>
-                        <div className="text-xs text-muted-foreground">2 Variants</div>
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground">Laptop</span>
-                    <span className="text-foreground">$2399.00</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-chart-1/10 text-chart-1">
-                      Delivered
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-md bg-muted" />
-                      <div>
-                        <div className="font-medium text-foreground">Apple Watch Ultra</div>
-                        <div className="text-xs text-muted-foreground">1 Variant</div>
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground">Watch</span>
-
-                    <span className="text-foreground">$879.00</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-muted text-foreground/80">
-                      Pending
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-md bg-muted" />
-                      <div>
-                        <div className="font-medium text-foreground">iPhone 15 Pro Max</div>
-                        <div className="text-xs text-muted-foreground">2 Variants</div>
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground">SmartPhone</span>
-                    <span className="text-foreground">$1869.00</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-chart-1/10 text-chart-1">
-                      Delivered
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-md bg-muted" />
-                      <div>
-                        <div className="font-medium text-foreground">iPad Pro 3rd Gen</div>
-                        <div className="text-xs text-muted-foreground">2 Variants</div>
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground">Electronics</span>
-                    <span className="text-foreground">$1699.00</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-destructive/10 text-destructive">
-                      Canceled
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="flex items-center gap-3">
-                      <div className="size-9 rounded-md bg-muted" />
-                      <div>
-                        <div className="font-medium text-foreground">Airpods Pro 2nd Gen</div>
-                        <div className="text-xs text-muted-foreground">1 Variant</div>
-                      </div>
-                    </div>
-                    <span className="text-muted-foreground">Accessories</span>
-                    <span className="text-foreground">$240.00</span>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-chart-1/10 text-chart-1">
-                      Delivered
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </main>
+
+      {/* Recent Orders Table */}
+      <Card className="border-gray-200 dark:border-gray-800">
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">Pedidos Recentes</CardTitle>
+          <CardDescription>Últimas transações realizadas</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* Table Header */}
+          <div className="hidden sm:grid sm:grid-cols-5 gap-3 text-xs font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-800 pb-3">
+            <span>Produto</span>
+            <span>Categoria</span>
+            <span>Preço</span>
+            <span>Status</span>
+          </div>
+
+          {/* Table Rows */}
+          <div className="mt-3 space-y-3">
+            {orders.map((order, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-center py-2 border-b border-gray-100 dark:border-gray-800/50 last:border-0"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center shrink-0">
+                    <Package className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {order.product}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 sm:hidden">
+                      {order.category} · {order.price}
+                    </p>
+                  </div>
+                </div>
+                <span className="hidden sm:block text-sm text-gray-500 dark:text-gray-400">
+                  {order.category}
+                </span>
+                <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-white">
+                  {order.price}
+                </span>
+                <div className="sm:hidden">
+                  <OrderStatusBadge status={order.status} />
+                </div>
+                <span className="hidden sm:block">
+                  <OrderStatusBadge status={order.status} />
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
