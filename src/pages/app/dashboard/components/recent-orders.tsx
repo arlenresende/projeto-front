@@ -12,7 +12,7 @@ interface Order {
 }
 
 export function RecentOrders() {
-  const orders = useMemo(
+  const orders = useMemo<Order[]>(
     () => [
       {
         product: 'Macbook Pro 13"',
