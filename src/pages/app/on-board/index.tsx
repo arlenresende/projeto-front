@@ -16,7 +16,7 @@ import Form from './form';
 
 export default function OnBoard() {
   const [activeConfetti, setActiveConfetti] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
 
   return (
     <>
